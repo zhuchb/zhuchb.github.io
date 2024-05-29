@@ -3,7 +3,7 @@ title: "Demo Post 1"
 description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
 pubDate: "Sep 10 2022"
 heroImage: "/blog_images/IMG_9083.jpg"
-tags: ["tokio"]
+tags: ["travel"]
 ---
 To be Confirmed.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
