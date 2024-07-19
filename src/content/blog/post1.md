@@ -1,6 +1,6 @@
 ---
 title: "论文笔记 AnyGPT:Unified Multimodal LLM with Discrete Sequence Modeling"
-description: "Cluster 1: Intro to Deep Learning"
+description: "Notes about the papaer AnyGPT"
 pubDate: "July 18 2024"
 heroImage: "/blog_images/anygpt.png"
 tags: ["Multimodal", "LLM"]
