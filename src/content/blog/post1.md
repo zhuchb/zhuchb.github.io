@@ -82,7 +82,7 @@ graph TD;
 </div>
 
 **speech:**
-<div class="mermaid">
+```mermaid
 graph TD;
  A[LLM]-->B([semantic token]);
  B-->C[SoundStorm];
@@ -90,7 +90,7 @@ graph TD;
  B-->E[SpeechTokenizer's Decoder];
  D-->E[SpeechTokenizer's Decoder];
  E-->F([audio])
-</div>
+```
 
 ## Data
 数据集的构造过程。从topic扩写到multi-turn conversation。并给LLM提供具体的包含了多种模态的例子。扩写的conversation中speech，music和image先用text描述，再合成出来。
