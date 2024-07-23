@@ -1,5 +1,5 @@
 ---
-title: "论文笔记 UniAudio: An Audio Foundation Model Toward Universal Audio Generation
+title: "论文笔记 UniAudio: An Audio Foundation Model Toward Universal Audio Generation"
 description: "Notes about the paper UniAudio"
 pubDate: "July 23 2024"
 heroImage: "/blog_images/UniAudio.png"

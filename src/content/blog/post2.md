@@ -90,7 +90,7 @@ graph TD;
  B-->C[当前时间t的fine acoustic token];
  </div>
 
-## 
+
 
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
