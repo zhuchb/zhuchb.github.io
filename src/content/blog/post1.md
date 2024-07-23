@@ -1,6 +1,6 @@
 ---
 title: "论文笔记 AnyGPT:Unified Multimodal LLM with Discrete Sequence Modeling"
-description: "Notes about the papaer AnyGPT"
+description: "Notes about the paper AnyGPT"
 pubDate: "July 18 2024"
 heroImage: "/blog_images/anygpt.png"
 tags: ["Multimodal", "LLM"]
