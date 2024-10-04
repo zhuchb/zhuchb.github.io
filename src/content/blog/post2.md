@@ -25,30 +25,19 @@ https://github.com/huawei-noah/Speech-Backbones/tree/main
 
 ## Inference.py
 
+
+intersperse: 序列变为原来的两倍，间隔地插入text的元素，间隔位置是len(symbols) 
+为什么？？
+
+text_to_sequence: 根据CMU词典把text转换成各个音素或者符号的ID的sequence
+len(symbols): 词典的大小。这个词典包括arphabet和各种可能的符号。
 ```python
-#传入模型参数。模型定义在tts.py
-generator = GradTTS() 
-#载入checkpoint
-generator.load_state_dict()
-
-#载入vocoder的hifigan
-hifigan = HiFiGAN()
-hifigan = load_state_dict
-
 text = "some text"
-# intersperse: 序列变为原来的两倍，间隔地插入text的元素，间隔位置是len(symbols) 
-# 为什么？？
-# text_to_sequence: 根据CMU词典把text转换成各个音素或者符号的ID的sequence
-# len(symbols): 词典的大小。这个词典包括arphabet和各种可能的符号。
 x = torch.LongTensor(intersperse(text_to_sequence(text, dictionary=cmu), len(symbols))
-
-#Grad-TTS生成, y_dec是decoder的输出
-y_enc, y_dec, attn = generator.forward(x, x_lengths, n_timesteps, temparature...,)
-
-#最后通过vocoder把梅尔频转换成wav
-with torch.no_grad():
-    audio = hifigan.forward(y_dec).cpu().squeeze().clamp(-1, 1)
 ```
+
+Grad-TTS生成, y_dec是decoder的输出。最后通过vocoder把梅尔频转换成wav
+
 
 ## train.py
 
@@ -57,13 +46,8 @@ with torch.no_grad():
 #batch_collate用的是一个自己写好的BatchCollate
 train_dataset = TextMelDataset(train_filelist_path,...)
 batch_collate = TextMelBatchCollate()
-loader = DataLoader(dataset=train_dataset,...)
-test_dataset = TextMelDataset(valid_filelist_path,...)
-
 #定义模型
 model = GradTTS(...)
-#定义optimizer
-optimizer = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
 ```
 
 每个epoch进行train和eval。因为param.save_every被设为了1.
@@ -71,59 +55,31 @@ optimizer = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
 n_epochs是10000
 
 ```python
-for epoch in range(1, n_epochs + 1):
-    # 每个epoch从loader中产生一个batch
-    for batch_idx, batch in enumerate(progress_bar):
-        model.train()
-        ...
-        #当epoch是params.save_every的倍数的时候，才会执行后面的eval和保存checkpoint
-        #这是为了一定时间执行一次eval和save
-        if epoch % params.save_every > 0:
-                continue
-    # tests_batch只有一个
+#当epoch是params.save_every的倍数的时候，才会执行后面的eval和保存checkpoint
+#这是为了一定时间执行一次eval和save
+if epoch % params.save_every > 0:
+    continue
+# tests_batch只有一个
     for i, item in enumerate(test_batch):
         model.eval()
-        ...
-        torch.save(ckpt)
 ```
 
 训练过程中有3个Loss：dur_loss, prior_loss, diff_loss
 
-总的loss是三个loss相加：loss = sum([dur_loss, prior_loss, diff_loss])
-
+总的loss是三个loss相加
 ```python
-#train
-model.train()
-with tqdm(loader, total=len(train_dataset)//batch_size) as progress_bar:
-    for batch_idx, batch in enumerate(progress_bar):
-        model.zero_grad()
-        x, x_lengths = batch['x'].cuda(), batch['x_lengths'].cuda()
-        y, y_lengths = batch['y'].cuda(), batch['y_lengths'].cuda()
-        dur_loss, prior_loss, diff_loss = model.compute_loss(x, x_lengths,
-                                                             y, y_lengths,
-                                                             out_size=out_size)
-        loss = sum([dur_loss, prior_loss, diff_loss])
-        loss.backward()
-        # 梯度裁剪 gradient clipping
-        # max_norm=1设置了梯度的最大范数(norm，表示某种距离)。如果L2_norm(grad) > max_norm，则按比例缩小所有梯度，使总范数等于 max_norm。
-        # 通常在反向传播之后、优化器步骤之前执行。有助于防止训练不稳定。
-        enc_grad_norm = torch.nn.utils.clip_grad_norm_(model.encoder.parameters(),
-                                                               max_norm=1)
-        dec_grad_norm = torch.nn.utils.clip_grad_norm_(model.decoder.parameters(),
-                                                               max_norm=1)
-        optimizer.step()
-        iteration += 1
+loss = sum([dur_loss, prior_loss, diff_loss])
 ```
 
+
+**梯度裁剪 gradient clipping**
+
+max_norm=1设置了梯度的最大范数(norm，表示某种距离)。如果L2_norm(grad) > max_norm，则按比例缩小所有梯度，使总范数等于 max_norm。通常在反向传播之后、优化器步骤之前执行。有助于防止训练不稳定。
 ```python
-# eval
-model.eval()
-with torch.no_grad():
-    for i, item in enumerate(test_batch):
-        x = item['x'].to(torch.long).unsqueeze(0).cuda()
-        x_lengths = torch.LongTensor([x.shape[-1]]).cuda()
-        y_enc, y_dec, attn = model(x, x_lengths, n_timesteps=50)
+enc_grad_norm = torch.nn.utils.clip_grad_norm_(model.encoder.parameters(),max_norm=1)
+dec_grad_norm = torch.nn.utils.clip_grad_norm_(model.decoder.parameters(),max_norm=1)
 ```
+
 
 ## text_encoder.py
 
